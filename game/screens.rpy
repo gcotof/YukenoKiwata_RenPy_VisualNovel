@@ -75,6 +75,40 @@ style frame:
     padding gui.frame_borders.padding
     background Frame("gui/frame.png", gui.frame_borders, tile=gui.frame_tile)
 
+# Imágen Patrón Floral del Menú
+init python:
+    def scroll_0_func(trans, st, at):
+        speed = 100.0
+        tile_h = 524
+        offset = (st * speed) % tile_h
+        trans.yoffset = -offset
+        return 0
+
+    def scroll_1_func(trans, st, at):
+        speed = 100.0
+        tile_h = 524
+        offset = (st * speed) % tile_h
+        trans.yoffset = -offset + 524
+        return 0
+
+    def scroll_2_func(trans, st, at):
+        speed = 100.0
+        tile_h = 524
+        offset = (st * speed) % tile_h
+        trans.yoffset = -offset + 1048
+        return 0
+
+transform scroll_0:
+    subpixel True
+    function scroll_0_func
+
+transform scroll_1:
+    subpixel True
+    function scroll_1_func
+
+transform scroll_2:
+    subpixel True
+    function scroll_2_func
 
 
 ################################################################################
@@ -356,7 +390,9 @@ screen main_menu():
     tag menu
 
     add gui.main_menu_background
-
+    add "gui/floral_pattern_tile.png" xalign 0.5 at scroll_0
+    add "gui/floral_pattern_tile.png" xalign 0.5 at scroll_1
+    add "gui/floral_pattern_tile.png" xalign 0.5 at scroll_2
     ## Este marco vacío oscurece el menu principal.
     frame:
         style "main_menu_frame"
