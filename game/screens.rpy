@@ -101,6 +101,16 @@ transform nav_arrow_hover:
         linear 0.15 alpha 1.0
     on idle:
         linear 0.15 alpha 0.0
+
+transform arrow_pop:
+    alpha 0.0
+    xoffset -10
+    on show:
+        linear 0.12 alpha 1.0 xoffset 0
+
+transform nav_text_shift(active):
+    xoffset 0
+    linear 0.15 xoffset (15 if active else 0)
 ################################################################################
 ## Pantallas internas del juego
 ################################################################################
@@ -310,53 +320,67 @@ style quick_button_text:
 ##
 ## Esta pantalla está incluída en el menú principal y los menús del juego y
 ## ofrece navegación a los otros menús y al inicio del juego.
+#Variable para identificar cuál botón está siendo hovered.
+default nav_hovered = None
+style nav_arrow is navigation_button_text:
+    color "#eb3720"
+    size 50 
 
+screen nav_item(label, action, key):
+
+    hbox:
+        spacing 12
+        yalign 0.5
+
+        if nav_hovered == key:
+            text "▼" style "nav_arrow"
+        else:
+            text " " style "nav_arrow"
+
+        textbutton label:
+            action action
+            style "navigation_button"
+            hovered SetVariable("nav_hovered", key)
+            unhovered SetVariable("nav_hovered", None)
+
+            at nav_text_shift(nav_hovered == key)
 screen navigation():
 
     vbox:
         style_prefix "navigation"
-
-        #Alineación de los botones del menú.
-        xpos 500    
+        xpos 500
         yalign 0.5
-
         spacing gui.navigation_spacing
 
         if main_menu:
 
-            textbutton _("Comenzar") action Start()
+            use nav_item(_("Comenzar"), Start(), "start")
 
         else:
 
-            textbutton _("Historial") action ShowMenu("history")
+            use nav_item(_("Historial"), ShowMenu("history"), "history")
+            use nav_item(_("Guardar"), ShowMenu("save"), "save")
 
-            textbutton _("Guardar") action ShowMenu("save")
-
-        textbutton _("Cargar") action ShowMenu("load")
-
-        textbutton _("Opciones") action ShowMenu("preferences")
+        use nav_item(_("Cargar"), ShowMenu("load"), "load")
+        use nav_item(_("Opciones"), ShowMenu("preferences"), "preferences")
 
         if _in_replay:
 
-            textbutton _("Finaliza repetición") action EndReplay(confirm=True)
+            use nav_item(_("Finaliza repetición"), EndReplay(confirm=True), "endreplay")
 
         elif not main_menu:
 
-            textbutton _("Menú principal") action MainMenu()
+            use nav_item(_("Menú principal"), MainMenu(), "mainmenu")
 
-        textbutton _("Acerca de") action ShowMenu("about")
+        use nav_item(_("Acerca de"), ShowMenu("about"), "about")
 
         if renpy.variant("pc") or (renpy.variant("web") and not renpy.variant("mobile")):
 
-            ## La ayuda no es necesaria ni relevante en dispositivos móviles.
-            textbutton _("Ayuda") action ShowMenu("help")
+            use nav_item(_("Ayuda"), ShowMenu("help"), "help")
 
         if renpy.variant("pc"):
 
-            ## El botón de salida está prohibido en iOS y no es necesario en
-            ## Android y Web.
-            textbutton _("Salir") action Quit(confirm=not main_menu)
-
+            use nav_item(_("Salir"), Quit(confirm=not main_menu), "quit")
 
 style navigation_button is gui_button
 style navigation_button_text is gui_button_text
@@ -375,6 +399,24 @@ style navigation_button_text:
     insensitive_color "#888888"
     outlines [(5, "#000000", 0, 0)]          # Contorno normal
     #hover_outlines [(3, "#eb3720", 0, 0)]    # Contorno en hover
+
+
+screen game_menu_nav():
+
+    vbox:
+        xpos 60
+        yalign 0.5
+        spacing 12
+
+        textbutton _("Menú principal"):
+            style "gm_nav_button"
+            action MainMenu()
+
+        if renpy.variant("pc"):
+            textbutton _("Salir"):
+                style "gm_nav_button"
+                action Quit(confirm=True)
+
 
 
 ## Pantalla del menú principal #################################################
@@ -454,6 +496,7 @@ screen game_menu(title, scroll=None, yinitial=0.0, spacing=0):
         add gui.game_menu_background
 
     frame:
+        use game_menu_nav
         style "game_menu_outer_frame"
 
         hbox:
