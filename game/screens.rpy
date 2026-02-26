@@ -93,6 +93,14 @@ transform infinite_scroll:
 transform rotate_floral:
     rotate 35
 
+
+transform nav_arrow_hover:
+    xoffset -40
+    alpha 0.0
+    on hover:
+        linear 0.15 alpha 1.0
+    on idle:
+        linear 0.15 alpha 0.0
 ################################################################################
 ## Pantallas internas del juego
 ################################################################################
@@ -308,7 +316,8 @@ screen navigation():
     vbox:
         style_prefix "navigation"
 
-        xpos gui.navigation_xpos
+        #Alineación de los botones del menú.
+        xpos 500    
         yalign 0.5
 
         spacing gui.navigation_spacing
@@ -358,6 +367,14 @@ style navigation_button:
 
 style navigation_button_text:
     properties gui.text_properties("navigation_button")
+    font "gui/fonts/VHS-Mono-Caps.ttf"
+    size 48
+    color "#FFFFFF" 
+    hover_color "#eb3720"    # Color al pasar el mouse (highlight)
+    selected_color "#eb3720" # Si está seleccionado
+    insensitive_color "#888888"
+    outlines [(5, "#000000", 0, 0)]          # Contorno normal
+    #hover_outlines [(3, "#eb3720", 0, 0)]    # Contorno en hover
 
 
 ## Pantalla del menú principal #################################################
@@ -387,17 +404,6 @@ screen main_menu():
     ## La sentencia 'use' incluye otra pantalla dentro de esta. El contenido
     ## real del menú principal está en la pantalla de navegación.
     use navigation
-
-    if gui.show_name:
-
-        vbox:
-            style "main_menu_vbox"
-
-            text "[config.name!t]":
-                style "main_menu_title"
-
-            text "[config.version]":
-                style "main_menu_version"
 
 
 style main_menu_frame is empty
@@ -495,8 +501,6 @@ screen game_menu(title, scroll=None, yinitial=0.0, spacing=0):
                 else:
 
                     transclude
-
-    use navigation
 
     textbutton _("Volver"):
         style "return_button"
