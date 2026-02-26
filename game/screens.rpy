@@ -77,39 +77,21 @@ style frame:
 
 # Imágen Patrón Floral del Menú
 init python:
-    def scroll_0_func(trans, st, at):
+    TILE_H = 524
+    COPIES = 5
+    TOTAL_H = TILE_H * COPIES
+
+    def scroll_func(trans, st, at):
         speed = 100.0
-        tile_h = 524
-        offset = (st * speed) % tile_h
+        offset = (st * speed) % TILE_H
         trans.yoffset = -offset
         return 0
 
-    def scroll_1_func(trans, st, at):
-        speed = 100.0
-        tile_h = 524
-        offset = (st * speed) % tile_h
-        trans.yoffset = -offset + 524
-        return 0
-
-    def scroll_2_func(trans, st, at):
-        speed = 100.0
-        tile_h = 524
-        offset = (st * speed) % tile_h
-        trans.yoffset = -offset + 1048
-        return 0
-
-transform scroll_0:
+transform infinite_scroll:
     subpixel True
-    function scroll_0_func
-
-transform scroll_1:
-    subpixel True
-    function scroll_1_func
-
-transform scroll_2:
-    subpixel True
-    function scroll_2_func
-
+    function scroll_func
+transform rotate_floral:
+    rotate 35
 
 ################################################################################
 ## Pantallas internas del juego
@@ -390,9 +372,14 @@ screen main_menu():
     tag menu
 
     add gui.main_menu_background
-    add "gui/floral_pattern_tile.png" xalign 0.5 at scroll_0
-    add "gui/floral_pattern_tile.png" xalign 0.5 at scroll_1
-    add "gui/floral_pattern_tile.png" xalign 0.5 at scroll_2
+    fixed:
+        xpos 1985
+        ypos 540
+        anchor (0.5, 0.5)
+        at rotate_floral
+
+        for i in range(5):
+            add "gui/floral_pattern_tile.png" yoffset (i * 524) at infinite_scroll
     ## Este marco vacío oscurece el menu principal.
     frame:
         style "main_menu_frame"
